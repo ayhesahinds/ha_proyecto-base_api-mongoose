@@ -18,31 +18,27 @@ const faker = require("@faker-js/faker").fakerES;
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
-
 module.exports = async () => {
   const users = [];
-  const userPassword = await bcrypt.hash("1234", 10);
+  const hashedPassword = await bcrypt.hash("1234", 10);
 
-  for (let i = 0; i <= 10; i++) {
+  for (let i = 0; i <= 100; i++) {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
-    const age = faker.number.int({ min: 18, max: 80 })
-
+    const age = faker.number.int({ min: 18, max: 80 });
 
     users.push({
       firstname: firstName,
       lastname: lastName,
       age: age,
       email: faker.internet.email({ firstName, lastName, provider: "gmail.com" }),
-      username: faker.internet.displayName({ firstName, }),
+      username: faker.internet.displayName({ firstName }),
 
       bio: faker.lorem.sentence(5),
-      password: userPassword,
+      password: hashedPassword,
       avatar: faker.image.avatar,
-
     });
   }
-
 
   await User.insertMany(users);
   console.log("[Database] Se corrió el seeder de Users.");
