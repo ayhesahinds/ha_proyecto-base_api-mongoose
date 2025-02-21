@@ -5,6 +5,8 @@ const userSchema = new Schema(
     firstname: String,
     lastname: String,
     age: Schema.Types.Number,
+    username: Schema.Types.Mixed,
+    email: Schema.Types.Mixed,
   },
   {
     timestamps: true,
