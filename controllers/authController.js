@@ -9,7 +9,7 @@ async function getToken(req, res) {
   const isValidPassword = await bcrypt.compare(req.body.password, user.password);
   if (!isValidPassword) return res.json({ msg: "Credenciales incorrectas" });
 
-  const token = jwt.sign({ sub: userId }, process.env.JWT_SECRET);
+  const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET);
   return res.json(token);
 }
 

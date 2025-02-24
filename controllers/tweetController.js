@@ -31,19 +31,23 @@ async function destroy(req, res) {}
 async function toogleLike(req, res) {
   try {
     const { id } = req.params;
-    const { userId } = req.auth;
+    const { sub } = req.auth;
     console.log(req.auth);
-    //const userId = sub;
+    const userId = sub;
     const tweet = await Tweet.findById(id);
 
     if (!tweet) return res.status(404).json({ msg: "Tweet not found" });
 
     const alreadyLiked = tweet.likes.includes(userId);
     if (alreadyLiked) {
-      await Tweet.findByIdAndUpdate(id, { $pull: { likes: userId } });
+      tweet.likes.pull(userId);
+      //await Tweet.findByIdAndUpdate(id, { $pull: { likes: userId } });
+      await tweet.save();
       return res.json({ msg: "Like removed" });
     }
-    await Tweet.findByIdAndUpdate(id, { $addToSet: { likes: userId } });
+    tweet.likes.push(userId);
+    await tweet.save();
+    //await Tweet.findByIdAndUpdate(id, { $addToSet: { likes: userId } });
     return res.json({ msg: "Like added" });
   } catch (error) {
     return res.status(500).json({ msg: error.message });
