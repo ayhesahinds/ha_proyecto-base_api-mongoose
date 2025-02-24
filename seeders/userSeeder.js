@@ -74,17 +74,6 @@ module.exports = async () => {
     } catch (error) {
       console.error(`Error descargando la imagen: ${error.message}`);
     }
-    users.push({
-      firstname: firstName,
-      lastname: lastName,
-      age: age,
-      email: faker.internet.email({ firstName, lastName, provider: "gmail.com" }),
-      username: faker.internet.displayName({ firstName }),
-
-      bio: faker.lorem.sentence(5),
-      password: hashedPassword,
-      avatar: faker.image.avatar,
-    });
   }
 
   await User.insertMany(users);
