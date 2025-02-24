@@ -45,10 +45,35 @@ async function store(req, res) {
 }
 
 // Update the specified resource in storage.
-async function update(req, res) {}
+async function update(req, res) {
+  try {
+    const id = req.params.id;
+    const { firstname, lastname, age, username, email, bio, password, avatar } = req.body;
+    const updateFields = { firstname, lastname, age, username, email, bio, avatar };
+
+    if (password) {
+      updateFields.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, updateFields, { new: true });
+    return res.json({ updatedUser });
+  } catch (error) {
+    return res.status(500).json({ msg: error.message });
+  }
+}
 
 // Remove the specified resource from storage.
-async function destroy(req, res) {}
+async function destroy(req, res) {
+  try {
+    const id = req.params.id;
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    return res.json({ msg: "User deleted succesfully" });
+  } catch (error) {
+    return res.status(500).json({ msg: error.message });
+  }
+}
 
 // Otros handlers...
 // ...

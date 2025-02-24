@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
+const { checkAuth } = require("../middleware/checkAuth");
 
 /*
  * API endpoints relacionados a los usuarios.
@@ -10,12 +11,10 @@ const userController = require("../controllers/userController");
  */
 
 router.get("/", userController.index);
-
+router.get("/:id", userController.show);
 router.post("/", userController.store);
 
-router.get("/:id", userController.show);
-
-router.patch("/:id", userController.update);
-router.delete("/:id", userController.destroy);
+router.patch("/:id", checkAuth, userController.update);
+router.delete("/:id", checkAuth, userController.destroy);
 
 module.exports = router;
