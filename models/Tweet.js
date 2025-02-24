@@ -1,11 +1,18 @@
 const { mongoose, Schema } = require("../db");
-const User = require("./User");
 
 const tweetSchema = new Schema(
   {
-    title: String,
-    content: String,
-
+    content: { type: String, maxLength: 140 },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    likes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps: true,

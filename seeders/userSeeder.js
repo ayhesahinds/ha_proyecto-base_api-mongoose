@@ -24,13 +24,14 @@ const path = require("path");
 
 module.exports = async () => {
   const users = [];
+  const hashedPassword = await bcrypt.hash("1234", 10);
   const userPassword = await bcrypt.hash("1234", 10);
   const imgDir = path.join(__dirname, "/../public/img");
 
 
 
 
-  for (let i = 0; i <= 10; i++) {
+  for (let i = 0; i <= 100; i++) {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const age = faker.number.int({ min: 18, max: 80 })
@@ -67,12 +68,23 @@ module.exports = async () => {
         email: faker.internet.email({ firstName, lastName, provider: "gmail.com" }),
         username: userName,
         bio: faker.lorem.sentence(10),
-        password: userPassword,
+        password: hashedPassword,
         avatar: imageFileName,
       });
     } catch (error) {
       console.error(`Error descargando la imagen: ${error.message}`);
     }
+    users.push({
+      firstname: firstName,
+      lastname: lastName,
+      age: age,
+      email: faker.internet.email({ firstName, lastName, provider: "gmail.com" }),
+      username: faker.internet.displayName({ firstName }),
+
+      bio: faker.lorem.sentence(5),
+      password: hashedPassword,
+      avatar: faker.image.avatar,
+    });
   }
 
   await User.insertMany(users);

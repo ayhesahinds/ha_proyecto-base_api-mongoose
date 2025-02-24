@@ -10,7 +10,7 @@ const userSchema = new Schema(
     email: String,
     bio: String,
     avatar: String,
-    tweets: String,
+    tweets: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
   },
   {
     timestamps: true,
