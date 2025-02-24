@@ -25,7 +25,6 @@ const path = require("path");
 module.exports = async () => {
   const users = [];
   const hashedPassword = await bcrypt.hash("1234", 10);
-  const userPassword = await bcrypt.hash("1234", 10);
   const imgDir = path.join(__dirname, "/../public/img");
 
 
