@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const exampleController = require("../controllers/exampleController");
 
+
 /*
  * En general, para cada recurso (o entidad) de la API REST se tienen estos
  * 5 endpoints, que corresponden al CRUD estándar (Create-Read-Update-Delete).

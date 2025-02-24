@@ -1,4 +1,4 @@
-const Article = require("../models/Article");
+const Tweet = require("../models/Tweet");
 
 // Display a listing of the resource.
 async function index(req, res) {}
