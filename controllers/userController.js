@@ -1,7 +1,8 @@
-const Tweet = require("../models/Tweet");
-const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const formidable = require("formidable");
+const fs = require("fs");
+const Tweet = require("../models/Tweet");
+const User = require("../models/User");
 
 // Display a listing of the resource.
 async function index(req, res) {
@@ -80,11 +81,21 @@ async function destroy(req, res) {
   try {
     const id = req.params.id;
 
-    await Tweet.deleteMany({ user: id });
-
     const user = await User.findByIdAndDelete(id);
 
     if (!user) return res.status(404).json({ msg: "User not found" });
+
+    await Tweet.deleteMany({ user: id });
+
+    if (user.avatar) {
+      const imagePath = __dirname + "/../public/img/" + user.avatar;
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        }
+      });
+    }
+
     return res.json({ msg: "User deleted succesfully" });
   } catch (error) {
     return res.status(500).json({ msg: error.message });
