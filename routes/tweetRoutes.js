@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const tweetController = require("../controllers/tweetController");
-const { checkAuth } = require("../middleware/checkAuth");
+const { checkAuth } = require("../middlewares/checkAuth");
 
 /*
  * API endpoints relacionados a los artículos.
