@@ -2,11 +2,8 @@ const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const formidable = require("formidable");
-<<<<<<< HEAD
-=======
 const path = require("path");
 
->>>>>>> 104d4a17e3e2ec3a0a8563414af08163c9cd83e7
 // Display a listing of the resource.
 async function index(req, res) {
   try {
@@ -32,38 +29,10 @@ async function show(req, res) {
 // Store a newly created resource in storage.
 async function store(req, res) {
   try {
-<<<<<<< HEAD
-    const { firstname, lastname, age, username, email, bio, password, avatar } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const form = formidable({
-      multiples: true,
-      uploadDir: __dirname + "/../public/img",
-      keepExtensions: true,
-    });
-
-    form.parse(req, async (err, fields, files) => {
-      if (err) return err;
-      const userId = req.auth.sub;
-      const { firstname, lastname, age, username, email, bio, password } = fields;
-      const avatar = files.image.newFilename;
-    });
-
-    const newUser = await User.create({
-      firstname,
-      lastname,
-      age,
-      username,
-      email,
-      bio,
-      password: hashedPassword,
-      avatar,
-=======
     const form = formidable({
       multiples: false,
       uploadDir: __dirname + "../public/img", //importante poner /../ para ir hacia atrás, solo con ../ NO FUNCIONA
       keepExtensions: true,
->>>>>>> 104d4a17e3e2ec3a0a8563414af08163c9cd83e7
     });
 
     const { password } = req.body;
