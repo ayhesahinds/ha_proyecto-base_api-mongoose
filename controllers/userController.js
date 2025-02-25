@@ -37,7 +37,7 @@ async function store(req, res) {
   form.parse(req, async (err, fields, files) => {
     if (err) return err;
 
-    const { firstname, lastname, username, password, bio, email } = fields;
+    const { firstname, lastname, username, password, bio, age, email } = fields;
     avatar = files.avatar.newFilename;
 
     try {
@@ -45,6 +45,7 @@ async function store(req, res) {
         firstname,
         lastname,
         username,
+        age,
         email,
         password,
         bio,
