@@ -62,6 +62,7 @@ async function store(req, res) {
   }
 }
 
+
 // Update the specified resource in storage.
 async function update(req, res) {
   try {
