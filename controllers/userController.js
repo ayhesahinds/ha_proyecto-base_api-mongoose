@@ -2,6 +2,7 @@ const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const formidable = require("formidable");
+
 const path = require("path");
 
 // Display a listing of the resource.
@@ -29,36 +30,36 @@ async function show(req, res) {
 // Store a newly created resource in storage.
 async function store(req, res) {
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const form = formidable({
-      multiples: false,
-      uploadDir: __dirname + "../public/img", //importante poner /../ para ir hacia atrás, solo con ../ NO FUNCIONA
+      multiples: true,
+      uploadDir: __dirname + "/../public/img",
       keepExtensions: true,
     });
 
-    const { password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     form.parse(req, async (err, fields, files) => {
-      const newUser = await User.create({
-        firstname: fields.firstname,
-        lastname: fields.lastname,
-        age: fields.age,
-        email: fields.email,
-        username: fields.username,
-        bio: fields.bio,
-        password: hashedPassword,
-        avatar: files.image.NewFileName,
-      });
-
-      return res.json({ newUser });
+      if (err) return err;
+      const userId = req.auth.sub;
+      const { firstname, lastname, age, username, email, bio, password } = fields;
+      const avatar = files.image.newFilename;
     });
 
+    const newUser = await User.create({
+      firstname,
+      lastname,
+      age,
+      username,
+      email,
+      bio,
+      password: hashedPassword,
+      avatar,
+    });
 
+    return res.json({ newUser });
   } catch (error) {
     return res.status(500).json({ msg: error.message });
   }
-
-
 }
 
 // Update the specified resource in storage.
