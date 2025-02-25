@@ -14,7 +14,13 @@ router.get("/", userController.index);
 router.get("/:id", userController.show);
 router.post("/", userController.store);
 
-router.patch("/:id", checkAuth, userController.update);
-router.delete("/:id", checkAuth, userController.destroy);
+router.use(checkAuth);
+
+router.patch("/:id", userController.update);
+router.delete("/:id", userController.destroy);
+
+router.get("/:id/followers", userController.showFollowers);
+router.get("/:id/followings", userController.showFollowings);
+router.patch("/:id/follow", userController.toogleFollow);
 
 module.exports = router;

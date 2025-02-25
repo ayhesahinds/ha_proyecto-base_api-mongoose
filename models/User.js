@@ -11,6 +11,8 @@ const userSchema = new Schema(
     bio: String,
     avatar: String,
     tweets: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    followings: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   {
     timestamps: true,
