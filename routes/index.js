@@ -7,8 +7,7 @@ const userRoutes = require("./userRoutes");
 const tweetRoutes = require("./tweetRoutes");
 const authRoutes = require("./authRoutes");
 const exampleRoutes = require("./exampleRoutes");
-
-
+const pagesRoutes = require("./pagesRoutes");
 
 module.exports = (app) => {
   /*
@@ -21,8 +20,9 @@ module.exports = (app) => {
    * (en inglés y en plural). Del mismo modo, las rutas relativas a los artículos
    * se deberían agrupar bajo la URL `/articles` (en inglés y en plural).
    */
+  app.use("/", authRoutes);
   app.use("/users", userRoutes);
   app.use("/tweets", tweetRoutes);
-  app.use("/", authRoutes);
   app.use("/examples", exampleRoutes);
+  app.use("/", pagesRoutes);
 };
