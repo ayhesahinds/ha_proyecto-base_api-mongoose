@@ -1,7 +1,7 @@
 const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-
+const formidable = require("formidable");
 // Display a listing of the resource.
 async function index(req, res) {
   try {
@@ -29,6 +29,20 @@ async function store(req, res) {
   try {
     const { firstname, lastname, age, username, email, bio, password, avatar } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const form = formidable({
+      multiples: true,
+      uploadDir: __dirname + "/../public/img",
+      keepExtensions: true,
+    });
+
+    form.parse(req, async (err, fields, files) => {
+      if (err) return err;
+      const userId = req.auth.sub;
+      const { firstname, lastname, age, username, email, bio, password } = fields;
+      const avatar = files.image.newFilename;
+    });
+
     const newUser = await User.create({
       firstname,
       lastname,
