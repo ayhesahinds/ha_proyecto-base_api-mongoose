@@ -1,3 +1,4 @@
+const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
@@ -66,6 +67,9 @@ async function update(req, res) {
 async function destroy(req, res) {
   try {
     const id = req.params.id;
+
+    await Tweet.deleteMany({ user: id });
+
     const user = await User.findByIdAndDelete(id);
 
     if (!user) return res.status(404).json({ msg: "User not found" });
