@@ -1,6 +1,8 @@
 const formidable = require("formidable");
 const bcrypt = require("bcryptjs");
 const fs = require("fs");
+const { createClient } = require("@supabase/supabase-js");
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 
@@ -31,7 +33,7 @@ async function store(req, res) {
   try {
     const form = formidable({
       multiples: false,
-      uploadDir: __dirname + "/../public/img",
+      //uploadDir: __dirname + "/../public/img",
       keepExtensions: true,
     });
 
@@ -39,7 +41,9 @@ async function store(req, res) {
       if (err) return err;
 
       const { firstname, lastname, username, password, bio, age, email } = fields;
-      const avatar = files.avatar.newFilename;
+
+      const ext = path.extname(files.avatar.filepath);
+      const newFileName = `image_${Date.now()}${ext}`;
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = await User.create({
@@ -53,8 +57,16 @@ async function store(req, res) {
         avatar,
       });
 
-      return res.json({ newUser });
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .upload(newFileName, fs.createReadStream(files.avatar.filepath), {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: files.avatar.mimetype,
+        });
     });
+
+    return res.json({ newUser });
   } catch (error) {
     res.status(500).json({ msg: error });
   }
@@ -67,7 +79,7 @@ async function update(req, res) {
 
     const form = formidable({
       multiples: false,
-      uploadDir: __dirname + "/../public/img",
+      //uploadDir: __dirname + "/../public/img",
       keepExtensions: true,
     });
 
@@ -75,7 +87,8 @@ async function update(req, res) {
       if (err) return err;
 
       const { firstname, lastname, username, password, bio, age, email } = fields;
-      const avatar = files.avatar.newFilename;
+      const ext = path.extname(files.avatar.filepath);
+      const newFileName = `image_${Date.now()}${ext}`;
 
       const updateFields = {
         firstname,
@@ -88,20 +101,19 @@ async function update(req, res) {
         avatar,
       };
 
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .upload(newFileName, fs.createReadStream(files.avatar.filepath), {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: files.avatar.mimetype,
+        });
+
       if (password) {
         updateFields.password = await bcrypt.hash(password, 10);
       }
 
       const user = await User.findByIdAndUpdate(id, updateFields, { new: true });
-
-      /*      if (avatar) {
-        const imagePath = __dirname + "/../public/img/" + user.avatar;
-        fs.unlink(imagePath, (err) => {
-          if (err) {
-            console.error("Error deleting file:", err);
-          }
-        });
-      } */
 
       return res.json({ user });
     });
@@ -120,15 +132,6 @@ async function destroy(req, res) {
     if (!user) return res.status(404).json({ msg: "User not found" });
 
     await Tweet.deleteMany({ user: id });
-
-    if (user.avatar) {
-      const imagePath = __dirname + "/../public/img/" + user.avatar;
-      fs.unlink(imagePath, (err) => {
-        if (err) {
-          console.error("Error deleting file:", err);
-        }
-      });
-    }
 
     return res.json({ msg: "User deleted successfully" });
   } catch (error) {
