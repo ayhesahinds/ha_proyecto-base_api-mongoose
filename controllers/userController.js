@@ -64,9 +64,8 @@ async function store(req, res) {
           upsert: false,
           contentType: files.avatar.mimetype,
         });
+      return res.json({ newUser });
     });
-
-    return res.json({ newUser });
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
