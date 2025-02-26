@@ -41,7 +41,7 @@ async function store(req, res) {
       if (err) return err;
 
       const { firstname, lastname, username, password, bio, age, email } = fields;
-
+      console.log(fields, files);
       const ext = path.extname(files.avatar.filepath);
       const newFileName = `image_${Date.now()}${ext}`;
       const hashedPassword = await bcrypt.hash(password, 10);
