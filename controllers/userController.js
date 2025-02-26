@@ -132,6 +132,8 @@ async function destroy(req, res) {
 
     if (!user) return res.status(404).json({ msg: "User not found" });
 
+    await supabase.storage.from("avatars").remove([user.avatar]);
+
     await Tweet.deleteMany({ user: id });
 
     return res.json({ msg: "User deleted successfully" });
