@@ -128,7 +128,7 @@ async function update(req, res) {
 // Remove the specified resource from storage.
 async function destroy(req, res) {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
 
     const user = await User.findByIdAndDelete(id);
 
@@ -149,9 +149,11 @@ async function destroy(req, res) {
 async function showFollowers(req, res) {
   try {
     const { id } = req.params;
-    const user = await User.findById(id).populate("followers", "-password").sort({ createdAt: -1 });
+    const { followers } = await User.findById(id)
+      .populate("followers", "-password")
+      .sort({ createdAt: -1 });
 
-    return res.status(200).json({ followers: user.followers });
+    return res.status(200).json({ followers });
   } catch (error) {
     return res.status(500).json({ msg: error.message });
   }
@@ -160,11 +162,11 @@ async function showFollowers(req, res) {
 async function showFollowings(req, res) {
   try {
     const { id } = req.params;
-    const user = await User.findById(id)
+    const { followings } = await User.findById(id)
       .populate("followings", "-password")
       .sort({ createdAt: -1 });
 
-    return res.status(200).json({ followings: user.followings });
+    return res.status(200).json({ followings });
   } catch (error) {
     return res.status(500).json({ msg: error.message });
   }
