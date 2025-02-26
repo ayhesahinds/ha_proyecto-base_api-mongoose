@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const { createClient } = require("@supabase/supabase-js");
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const path = require("path");
 const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 
