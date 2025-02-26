@@ -33,8 +33,9 @@ module.exports = async () => {
   for (let i = 0; i <= 100; i++) {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
-    const age = faker.number.int({ min: 18, max: 80 })
-    const userName = `${firstName.toLowerCase()}_${age}`;
+    const age = faker.number.int({ min: 18, max: 80 });
+    const email = faker.internet.email({ firstName, lastName, provider: "gmail.com" });
+  
     // Generar un nombre único para la imagen utilizando crypto
     const imageFileName = `${crypto.randomUUID()}.jpg`;
 
@@ -64,8 +65,8 @@ module.exports = async () => {
         firstname: firstName,
         lastname: lastName,
         age: age,
-        email: faker.internet.email({ firstName, lastName, provider: "gmail.com" }),
-        username: userName,
+        email: email,
+        username: email,
         bio: faker.lorem.sentence(10),
         password: hashedPassword,
         avatar: imageFileName,
