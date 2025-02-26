@@ -33,7 +33,7 @@ async function show(req, res) {
 async function store(req, res) {
   try {
     const form = formidable({
-      multiples: false,
+      multiples: true,
       //uploadDir: __dirname + "/../public/img",
       keepExtensions: true,
     });
@@ -46,6 +46,15 @@ async function store(req, res) {
       const newFileName = `image_${Date.now()}${ext}`;
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .upload(newFileName, fs.createReadStream(files.avatar.filepath), {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: files.avatar.mimetype,
+          duplex: "half",
+        });
+
       const newUser = await User.create({
         firstname,
         lastname,
@@ -54,16 +63,8 @@ async function store(req, res) {
         email,
         password: hashedPassword,
         bio,
-        avatar,
+        avatar: newFileName,
       });
-
-      const { data, error } = await supabase.storage
-        .from("avatars")
-        .upload(newFileName, fs.createReadStream(files.avatar.filepath), {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: files.avatar.mimetype,
-        });
       return res.json({ newUser });
     });
   } catch (error) {
@@ -97,7 +98,7 @@ async function update(req, res) {
         age,
         bio,
         email,
-        avatar,
+        avatar: newFileName,
       };
 
       const { data, error } = await supabase.storage
@@ -106,6 +107,7 @@ async function update(req, res) {
           cacheControl: "3600",
           upsert: false,
           contentType: files.avatar.mimetype,
+          duplex: "half",
         });
 
       if (password) {
