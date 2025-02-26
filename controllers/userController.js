@@ -114,9 +114,11 @@ async function update(req, res) {
         updateFields.password = await bcrypt.hash(password, 10);
       }
 
-      const user = await User.findByIdAndUpdate(id, updateFields, { new: true });
+      const user = await User.findByIdAndUpdate(id, updateFields);
 
-      return res.json({ user });
+      await supabase.storage.from("avatars").remove([user.avatar]);
+
+      return res.json({ msg: "User updated successfully" });
     });
   } catch (error) {
     res.status(500).json({ msg: error.message });
@@ -132,7 +134,6 @@ async function destroy(req, res) {
 
     if (!user) return res.status(404).json({ msg: "User not found" });
 
-    console.log(user.avatar);
     await supabase.storage.from("avatars").remove([user.avatar]);
 
     await Tweet.deleteMany({ user: id });
