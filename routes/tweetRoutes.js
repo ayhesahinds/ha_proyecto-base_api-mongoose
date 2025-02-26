@@ -18,6 +18,6 @@ router.get("/:id", tweetController.show);
 router.patch("/:id", tweetController.update);
 router.delete("/:id", tweetController.destroy);
 
-router.patch("/:id/likes", tweetController.toogleLike);
+router.patch("/:id/likes", tweetController.toggleLike);
 
 module.exports = router;

@@ -1,5 +1,5 @@
-const bcrypt = require("bcryptjs");
 const formidable = require("formidable");
+const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const Tweet = require("../models/Tweet");
 const User = require("../models/User");
@@ -28,53 +28,55 @@ async function show(req, res) {
 
 // Store a newly created resource in storage.
 async function store(req, res) {
-  const form = formidable({
-    multiples: true,
-    uploadDir: __dirname + "/../public/img",
-    keepExtensions: true,
-  });
+  try {
+    const form = formidable({
+      multiples: false,
+      uploadDir: __dirname + "/../public/img",
+      keepExtensions: true,
+    });
 
-  form.parse(req, async (err, fields, files) => {
-    if (err) return err;
+    form.parse(req, async (err, fields, files) => {
+      if (err) return err;
 
-    const { firstname, lastname, username, password, bio, age, email } = fields;
-    avatar = files.avatar.newFilename;
+      const { firstname, lastname, username, password, bio, age, email } = fields;
+      const avatar = files.avatar.newFilename;
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    try {
-      newUser = await User.create({
+      const newUser = await User.create({
         firstname,
         lastname,
         username,
         age,
         email,
-        password,
+        password: hashedPassword,
         bio,
         avatar,
       });
 
-      return res.json({ msg: "User created succesfully" });
-    } catch (error) {
-      console.log(error);
-    }
-  });
+      return res.json({ newUser });
+    });
+  } catch (error) {
+    res.status(500).json({ msg: error });
+  }
 }
 
 // Update the specified resource in storage.
 async function update(req, res) {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const form = formidable({
-    multiples: true,
-    uploadDir: __dirname + "/../public/img",
-    keepExtensions: true,
-  });
+    const form = formidable({
+      multiples: false,
+      uploadDir: __dirname + "/../public/img",
+      keepExtensions: true,
+    });
 
-  form.parse(req, async (err, fields, files) => {
-    try {
+    form.parse(req, async (err, fields, files) => {
       if (err) return err;
 
       const { firstname, lastname, username, password, bio, age, email } = fields;
-      const { avatar } = files;
+      const avatar = files.avatar.newFilename;
+
       const updateFields = {
         firstname,
         lastname,
@@ -85,32 +87,28 @@ async function update(req, res) {
         email,
         avatar,
       };
+
       if (password) {
         updateFields.password = await bcrypt.hash(password, 10);
       }
 
-     
+      const user = await User.findByIdAndUpdate(id, updateFields, { new: true });
 
-      const user = await User.findByIdAndUpdate(id, updateFields);
-
-      if (user.avatar) {
+      /*      if (avatar) {
         const imagePath = __dirname + "/../public/img/" + user.avatar;
         fs.unlink(imagePath, (err) => {
           if (err) {
             console.error("Error deleting file:", err);
           }
         });
-      }
+      } */
 
-      return res.json({ msg: "User updated succesfully" });
-    } catch (error) {
-      res.status(500).json({ msg: "User updated unsuccesfully" });
-    }
-  });
+      return res.json({ user });
+    });
+  } catch (error) {
+    res.status(500).json({ msg: error });
+  }
 }
-
-
-
 
 // Remove the specified resource from storage.
 async function destroy(req, res) {
@@ -132,7 +130,7 @@ async function destroy(req, res) {
       });
     }
 
-    return res.json({ msg: "User deleted succesfully" });
+    return res.json({ msg: "User deleted successfully" });
   } catch (error) {
     return res.status(500).json({ msg: error.message });
   }
@@ -164,7 +162,7 @@ async function showFollowings(req, res) {
   }
 }
 
-async function toogleFollow(req, res) {
+async function toggleFollow(req, res) {
   try {
     const { id } = req.params;
     const userId = req.auth.sub;
@@ -209,5 +207,5 @@ module.exports = {
   destroy,
   showFollowers,
   showFollowings,
-  toogleFollow,
+  toggleFollow,
 };
