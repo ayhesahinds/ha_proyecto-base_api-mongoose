@@ -21,6 +21,6 @@ router.delete("/:id", userController.destroy);
 
 router.get("/:id/followers", userController.showFollowers);
 router.get("/:id/followings", userController.showFollowings);
-router.patch("/:id/follow", userController.toogleFollow);
+router.patch("/:id/follow", userController.toggleFollow);
 
 module.exports = router;
