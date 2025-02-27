@@ -4,7 +4,10 @@ const User = require("../models/User");
 // Display a listing of the resource.
 async function index(req, res) {
   try {
-    const tweets = await Tweet.find({ some: User }).sort({ createdAt: -1 }).limit(20);
+    const tweets = await Tweet.find()
+      .populate("user likes", "-password -tweets -followers -followings")
+      .sort({ createdAt: -1 })
+      .limit(20);
     return res.json({ tweets });
   } catch (error) {
     return res.status(500).json({ msg: error.message });
