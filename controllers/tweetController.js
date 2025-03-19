@@ -18,9 +18,6 @@ async function index(req, res) {
 async function show(req, res) {
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid tweet id" });
-    }
 
     const tweet = await Tweet.findById(id);
 
