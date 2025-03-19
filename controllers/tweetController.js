@@ -38,7 +38,21 @@ async function update(req, res) {
 }
 
 // Remove the specified resource from storage.
-async function destroy(req, res) {}
+async function destroy(req, res) {
+  try {
+    const { id } = req.params;
+
+    const tweet = await Tweet.findByIdAndDelete(id);
+
+    if (!tweet) {
+      return res.status(404).json({ msg: "Tweet not found" });
+    }
+
+    return res.json({ msg: "Tweet deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ msg: error.message });
+  }
+}
 
 // Otros handlers...
 // ...
