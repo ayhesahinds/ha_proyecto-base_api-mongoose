@@ -10,7 +10,7 @@ async function getToken(req, res) {
   if (!isValidPassword) return res.json({ msg: "Invalid Credentials" });
 
   const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET);
-  return res.json(token);
+  return res.json({ accessToken: token, userId: user.id, userAvatar: user.avatar });
 }
 
 module.exports = { getToken };
