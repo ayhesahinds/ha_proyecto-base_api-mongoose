@@ -18,7 +18,19 @@ async function index(req, res) {
 async function show(req, res) {}
 
 // Store a newly created resource in storage.
-async function store(req, res) {}
+async function store(req, res) {
+  try {
+    const { content, author } = req.body;
+
+    const tweet = await Tweet.create({ content, author });
+
+    return res.json({
+      tweet,
+    });
+  } catch (error) {
+    return res.status(500).json({ msg: error.message });
+  }
+}
 
 // Update the specified resource in storage.
 async function update(req, res) {
