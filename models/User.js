@@ -2,13 +2,27 @@ const { mongoose, Schema } = require("../db");
 
 const userSchema = new Schema(
   {
-    firstname: String,
-    lastname: String,
+    firstname: { type: String, required: true },
+    lastname: {
+      type: String,
+      required: true,
+    },
     age: Number,
-    username: String,
-    password: String,
-    email: String,
-    bio: String,
+    username: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    bio: {
+      type: String,
+    },
     avatar: String,
     tweets: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
