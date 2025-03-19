@@ -15,7 +15,24 @@ async function index(req, res) {
 }
 
 // Display the specified resource.
-async function show(req, res) {}
+async function show(req, res) {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid tweet id" });
+    }
+
+    const tweet = await Tweet.findById(id);
+
+    if (!tweet) {
+      return res.status(404).json({ message: "Tweet not found" });
+    }
+
+    return res.json({ tweet });
+  } catch (error) {
+    return res.status(500).json({ msg: error.message });
+  }
+}
 
 // Store a newly created resource in storage.
 async function store(req, res) {
