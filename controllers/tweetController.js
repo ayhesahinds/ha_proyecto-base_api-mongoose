@@ -5,7 +5,7 @@ const User = require("../models/User");
 async function index(req, res) {
   try {
     const tweets = await Tweet.find()
-      .populate("user likes", "-password -tweets -followers -followings")
+      .populate("user", "-password -tweets -followers -followings")
       .sort({ createdAt: -1 })
       .limit(20);
     return res.json({ tweets });
