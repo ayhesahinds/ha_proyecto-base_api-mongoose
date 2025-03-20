@@ -16,7 +16,7 @@ async function getToken(req, res) {
     lastname: user.lastname,
     avatar: user.avatar,
   };
-  return res.json({ accessToken: token, userData });
+  return res.json({ accessToken: token, ...userData });
 }
 
 module.exports = { getToken };
