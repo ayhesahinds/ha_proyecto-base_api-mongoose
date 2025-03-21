@@ -31,8 +31,8 @@ async function show(req, res) {
 
 // Store a newly created resource in storage.
 async function store(req, res) {
-  const { firstname, lastname, username, password, age, email } = req.body;
-  if (!firstname || !lastname || !username || !password || !email || !age) {
+  const { firstname, lastname, username, password, email } = req.body;
+  if (!firstname || !lastname || !username || !password || !email) {
     return res.status(400).json({ msg: "Missing required fields." });
   }
   try {
