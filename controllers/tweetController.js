@@ -34,9 +34,9 @@ async function show(req, res) {
 // Store a newly created resource in storage.
 async function store(req, res) {
   try {
-    const { content, author } = req.body;
+    const { content, user } = req.body;
 
-    const tweet = await Tweet.create({ content, author });
+    const tweet = await Tweet.create({ content, user });
 
     return res.json({
       tweet,
