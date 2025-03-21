@@ -14,29 +14,27 @@
  */
 
 const faker = require("@faker-js/faker").fakerES;
+const _ = require("lodash");
 const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 
 module.exports = async () => {
   const tweets = [];
   const users = await User.find();
-  const usersCopy = [...users];
-  const usersToLike = usersCopy.splice(0, 5);
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 200; i++) {
     const randomUser = users[faker.number.int({ min: 0, max: users.length - 1 })];
+    const likes = _.map(_.sampleSize(users, _.random(0, users.length / 2)), "_id");
 
     const newTweet = new Tweet({
-      content: faker.lorem.sentence(),
+      content: faker.lorem.sentence().slice(0, 140),
       user: randomUser._id,
-      likes: usersToLike,
+      likes,
     });
+    tweets.push(newTweet);
 
     randomUser.tweets.push(newTweet._id);
-
     await randomUser.save();
-
-    tweets.push(newTweet);
   }
 
   await Tweet.insertMany(tweets);
