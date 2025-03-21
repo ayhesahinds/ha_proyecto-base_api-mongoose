@@ -27,7 +27,7 @@ module.exports = async () => {
     users.push({
       firstname: faker.person.firstName(),
       lastname: faker.person.lastName(),
-      username: faker.internet.username(),
+      username: `${firstname.toLowerCase()}${lastname.toLowerCase()}`,
       password: hashedPassword,
       email: faker.internet.email(),
       bio: faker.lorem.sentence(),
