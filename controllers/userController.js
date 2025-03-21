@@ -31,6 +31,10 @@ async function show(req, res) {
 
 // Store a newly created resource in storage.
 async function store(req, res) {
+  const { firstname, lastname, username, password, age, email } = req.body;
+  if (!firstname || !lastname || !username || !password || !email || !age) {
+    return res.status(400).json({ msg: "Missing required fields." });
+  }
   try {
     const form = formidable({
       multiples: true,
@@ -65,7 +69,7 @@ async function store(req, res) {
         bio,
         avatar: newFileName,
       });
-      return res.json({ newUser });
+      return res.status(200).json({ newUser });
     });
   } catch (error) {
     res.status(500).json({ msg: error.message });

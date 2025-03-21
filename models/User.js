@@ -2,10 +2,13 @@ const { mongoose, Schema } = require("../db");
 
 const userSchema = new Schema(
   {
-    firstname: { type: String, required: true },
+    firstname: {
+      type: String,
+      required: [true, "First name is required"],
+    },
     lastname: {
       type: String,
-      required: true,
+      required: [true, "Last name is required"],
     },
     age: Number,
     username: {
@@ -14,11 +17,14 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters long"],
     },
     email: {
       type: String,
-      required: true,
+      unique: true,
+      required: [true, "Email is required"],
+      match: [/\S+@\S+\.\S+/, "Please enter a valid email address"],
     },
     bio: {
       type: String,
