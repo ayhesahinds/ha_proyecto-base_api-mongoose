@@ -24,9 +24,12 @@ module.exports = async () => {
   const hashedPassword = await bcrypt.hash("1234", 10);
 
   for (let i = 0; i < 100; i++) {
+    const firstname = faker.person.firstName();
+    const lastname = faker.person.lastName();
+
     users.push({
-      firstname: faker.person.firstName(),
-      lastname: faker.person.lastName(),
+      firstname,
+      lastname,
       username: `${firstname.toLowerCase()}${lastname.toLowerCase()}`,
       password: hashedPassword,
       email: faker.internet.email(),
