@@ -40,8 +40,8 @@ module.exports = async () => {
     const hashedPassword = await bcrypt.hash("1234", 10);
 
     for (let i = 0; i < 100; i++) {
-      const firstname = faker.person.firstName();
-      const lastname = faker.person.lastName();
+      const firstname = faker.person.firstName().split(" ")[0];
+      const lastname = faker.person.lastName().split(" ")[0];
       const avatarUrl = faker.image.avatar();
       const avatarBuffer = await fetchImageBuffer(avatarUrl);
       const avatar = await uploadAvatarToSupabase(avatarBuffer);

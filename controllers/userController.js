@@ -4,6 +4,7 @@ const fs = require("fs");
 const { createClient } = require("@supabase/supabase-js");
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const path = require("path");
+
 const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 
@@ -20,8 +21,16 @@ async function index(req, res) {
 // Display the specified resource.
 async function show(req, res) {
   try {
-    const { id } = req.params;
-    const user = await User.findById(id).select("-password").populate("tweets");
+    const user = await User.findOne({ username: req.params.username })
+      .select("-password")
+      .populate({
+        path: "tweets",
+        populate: {
+          path: "user",
+          model: User,
+        },
+      });
+
     if (!user) res.status(404).json({ msg: "User not found" });
     return res.json({ user });
   } catch (error) {

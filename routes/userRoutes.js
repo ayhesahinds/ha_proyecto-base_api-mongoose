@@ -11,7 +11,7 @@ const { checkAuth } = require("../middlewares/checkAuth");
  */
 
 router.get("/", userController.index);
-router.get("/:id", userController.show);
+router.get("/:username", userController.show);
 router.post("/", userController.store);
 
 router.use(checkAuth);
