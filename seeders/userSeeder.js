@@ -26,25 +26,38 @@ module.exports = async () => {
   const users = [];
   const hashedPassword = await bcrypt.hash("1234", 10);
   const imgDir = path.join(__dirname, "/../public/img");
-  
+  const BgUser = path.join(__dirname, "/../public/backgrounds");
 
 
 
-  for (let i = 0; i <= 100; i++) {
+
+  for (let i = 0; i <= 10; i++) {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const age = faker.number.int({ min: 18, max: 80 });
     const email = faker.internet.email({ firstName, lastName, provider: "gmail.com" });
-    const imageHead = faker.image.urlLoremFlickr({ width: 908, height: 250, category: 'nature' });
-    const numberUsername = faker.number.int({ max: 300 });
-    const wordUsername = faker.word.verb({ length: { min: 5, max: 12 } });
-    const username = faker.helpers.fake({ wordUsername, numberUsername });
-  
-    
+    const username = faker.helpers.mustache('{{word}}{{count}}', {
+      count: () => `${faker.number.int({ max: 870 })}`,
+      word: `${faker.word.verb({ length: { min: 5, max: 12 } })}`
+    })
 
-    
-  
-    // Generar un nombre único para la imagen utilizando crypto
+
+
+
+
+    // Background Profile 
+
+    const imageHead = faker.image.urlLoremFlickr({ width: 908, height: 250, category: 'nature' });
+
+
+
+
+
+
+
+
+
+    // Para el Avatar:  Generar un nombre único para la imagen utilizando crypto
     const imageFileName = `${crypto.randomUUID()}.jpg`;
 
     // Usar faker.image.personPortrait para obtener una URL de imagen aleatoria y se define el tamaño
@@ -65,21 +78,26 @@ module.exports = async () => {
       await new Promise((resolve, reject) => {
         writer.on("finish", resolve);
         writer.on("error", reject);
+
+
       });
 
 
- 
+
       users.push({
         firstname: firstName,
         lastname: lastName,
         age: age,
-        email: email,
-        username: username,
+        email: email.toLowerCase(),
+
         bio: faker.lorem.sentence(10),
         password: hashedPassword,
         avatar: imageFileName,
-        backgroundUser: imageHead,
-      
+        imgBg: imageHead,
+        username: username,
+
+
+
 
       });
     } catch (error) {
