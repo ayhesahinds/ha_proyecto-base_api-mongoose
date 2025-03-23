@@ -23,13 +23,7 @@ async function show(req, res) {
   try {
     const user = await User.findOne({ username: req.params.username })
       .select("-password")
-      .populate({
-        path: "tweets",
-        populate: {
-          path: "user",
-          model: User,
-        },
-      });
+      .populate("tweets");
 
     if (!user) res.status(404).json({ msg: "User not found" });
     return res.json({ user });

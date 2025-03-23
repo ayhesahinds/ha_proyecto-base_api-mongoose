@@ -2,6 +2,7 @@ const https = require("https");
 const faker = require("@faker-js/faker").fakerES;
 const bcrypt = require("bcryptjs");
 const { createClient } = require("@supabase/supabase-js");
+const _ = require("lodash");
 
 const User = require("../models/User");
 
@@ -16,7 +17,8 @@ const uploadAvatarToSupabase = async (avatarBuffer) => {
     });
 
     if (error) throw error;
-    return supabase.storage.from("avatars").getPublicUrl(data.path).publicURL;
+
+    return fileName;
   } catch (error) {
     console.error("Error al subir el avatar a Supabase:", error);
     return null;
@@ -39,27 +41,81 @@ module.exports = async () => {
     const users = [];
     const hashedPassword = await bcrypt.hash("1234", 10);
 
+    // Crear los usuarios
     for (let i = 0; i < 100; i++) {
       const firstname = faker.person.firstName().split(" ")[0];
       const lastname = faker.person.lastName().split(" ")[0];
+      const username = `${firstname.toLowerCase()}${lastname.toLowerCase()}`;
       const avatarUrl = faker.image.avatar();
       const avatarBuffer = await fetchImageBuffer(avatarUrl);
-      const avatar = await uploadAvatarToSupabase(avatarBuffer);
 
-      users.push({
+      const avatarFileName = await uploadAvatarToSupabase(avatarBuffer);
+
+      const user = {
         firstname,
         lastname,
-        username: `${firstname.toLowerCase()}${lastname.toLowerCase()}`,
+        username,
         password: hashedPassword,
-        email: faker.internet.email(),
+        email: `${username}@gmail.com`,
         bio: faker.lorem.sentence(),
-        avatar,
-      });
+        avatar: avatarFileName,
+        following: [],
+        followers: [],
+      };
+
+      users.push(user);
     }
 
-    await User.insertMany(users);
+    // Guardar usuarios en la base de datos y obtener sus ObjectIds
+    const savedUsers = await User.insertMany(users);
+    const userMap = savedUsers.reduce((map, user) => {
+      map[user.username] = user._id;
+      return map;
+    }, {});
+
+    // Crear las relaciones de followers y following usando un bucle for
+    for (let i = 0; i < savedUsers.length; i++) {
+      const user = savedUsers[i];
+
+      // Elegimos aleatoriamente hasta 10 usuarios para seguir (puedes ajustar el número)
+      const followingCount = Math.floor(Math.random() * 10) + 1;
+      const following = getRandomUsers(savedUsers, followingCount, user.username);
+
+      // Asignamos los ObjectIds de los usuarios a los que sigue
+      user.following = following.map((u) => userMap[u.username]);
+
+      // Actualizamos los followers de los usuarios que han sido seguidos
+      for (let j = 0; j < following.length; j++) {
+        const followedUser = following[j];
+        if (!followedUser.followers.includes(user._id)) {
+          followedUser.followers.push(user._id); // Aquí se asigna el ObjectId
+        }
+      }
+
+      // Actualizamos los usuarios en la base de datos con las relaciones de following
+      await User.updateOne({ _id: user._id }, { following: user.following });
+
+      // Actualizamos los followers de los usuarios seguidos
+      for (let j = 0; j < following.length; j++) {
+        const followedUser = following[j];
+        const followedUserObjectId = userMap[followedUser.username]; // Usamos ObjectId
+        await User.updateOne({ _id: followedUserObjectId }, { followers: followedUser.followers });
+      }
+    }
+
     console.log("[Database] Se corrió el seeder de Users.");
   } catch (error) {
     console.error("Error al ejecutar el seeder:", error);
   }
+};
+
+// Función para obtener usuarios aleatorios para seguir usando lodash
+const getRandomUsers = (users, count, excludeUsername) => {
+  // Filtramos para evitar que un usuario se siga a sí mismo
+  const otherUsers = users.filter((user) => user.username !== excludeUsername);
+
+  // Usamos lodash _.sampleSize para obtener un número aleatorio de usuarios para seguir
+  const randomUsers = _.sampleSize(otherUsers, count);
+
+  return randomUsers;
 };
