@@ -20,10 +20,9 @@ async function index(req, res) {
 
 // Display the specified resource.
 async function show(req, res) {
+  const { id } = req.params.id;
   try {
-    const user = await User.findOne({ username: req.params.username })
-      .select("-password")
-      .populate("tweets");
+    const user = await User.findById({ id }).select("-password").populate("tweets");
 
     if (!user) res.status(404).json({ msg: "User not found" });
     return res.json({ user });
