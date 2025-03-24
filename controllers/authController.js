@@ -20,7 +20,7 @@ async function getToken(req, res) {
 
     const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET);
     const userData = {
-      id: user.id,
+      _id: user._id,
       firstname: user.firstname,
       lastname: user.lastname,
       username: user.username,
