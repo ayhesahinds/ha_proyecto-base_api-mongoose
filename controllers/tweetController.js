@@ -5,9 +5,13 @@ const User = require("../models/User");
 async function index(req, res) {
   try {
     const tweets = await Tweet.find()
-      .populate("user", "-password -tweets -followers -followings")
-      .sort({ createdAt: -1 })
-      .limit(20);
+      .populate({
+        path: "user",
+        select: "-password -tweets -followers -followings",
+      })
+      .limit(20)
+      .sort({ createdAt: -1 });
+
     return res.json({ tweets });
   } catch (error) {
     return res.status(500).json({ msg: error.message });

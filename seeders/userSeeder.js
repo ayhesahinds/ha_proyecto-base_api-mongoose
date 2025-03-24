@@ -1,20 +1,9 @@
-/*
- * El seeder no es más que un archivo que contiene una función que se encarga
- * de insertar datos (generalmente de prueba) en una base de datos.
- *
- * El nombre "seeder" es una convención y significa "semillero".
- *
- * Además, en este caso, se está usando una librería llamada Faker
- * (https://fakerjs.dev/) para facilitar la creación de datos ficticios como
- * nombres, apellidos, títulos, direcciones y demás textos.
- *
- * Suele ser común que en los seeders exista un `for` donde se define la
- * cantidad de registros de prueba que se insertarán en la base de datos.
- *
- * En este ejemplo se están insertando 100 usuarios con nombres ficticios.
- */
-
+const https = require("https");
 const faker = require("@faker-js/faker").fakerES;
+const bcrypt = require("bcryptjs");
+
+const _ = require("lodash");
+
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const axios = require("axios");
@@ -41,19 +30,9 @@ module.exports = async () => {
       word: `${faker.word.verb({ length: { min: 5, max: 12 } })}`
     })
 
-
-
-
-
     // Background Profile 
 
     const imageHead = faker.image.urlLoremFlickr({ width: 908, height: 250, category: 'nature' });
-
-
-
-
-
-
 
 
 
@@ -66,7 +45,7 @@ module.exports = async () => {
     // Descargar la imagen y guardarla en la carpeta public/img
     try {
       const response = await axios({
-        url: imageUrl,
+        url: imageUrl, BgUser,
         method: "GET",
         responseType: "stream",
       });
@@ -89,14 +68,11 @@ module.exports = async () => {
         lastname: lastName,
         age: age,
         email: email.toLowerCase(),
-
         bio: faker.lorem.sentence(10),
         password: hashedPassword,
         avatar: imageFileName,
         imgBg: imageHead,
         username: username,
-
-
 
 
       });
