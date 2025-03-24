@@ -28,8 +28,10 @@ const userSchema = new Schema(
     },
     bio: {
       type: String,
+      required: true,
     },
     avatar: String,
+    background: String,
     tweets: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     followings: [{ type: Schema.Types.ObjectId, ref: "User" }],

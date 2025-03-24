@@ -1,121 +1,86 @@
 const https = require("https");
 const faker = require("@faker-js/faker").fakerES;
 const bcrypt = require("bcryptjs");
-const { createClient } = require("@supabase/supabase-js");
+
 const _ = require("lodash");
 
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const axios = require("axios");
+const fs = require("fs-extra");
+const path = require("path");
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-
-const uploadAvatarToSupabase = async (avatarBuffer) => {
-  try {
-    const fileName = `image_${Date.now()}.png`;
-
-    const { data, error } = await supabase.storage.from("avatars").upload(fileName, avatarBuffer, {
-      contentType: "image/png",
-    });
-
-    if (error) throw error;
-
-    return fileName;
-  } catch (error) {
-    console.error("Error al subir el avatar a Supabase:", error);
-    return null;
-  }
-};
-
-const fetchImageBuffer = (url) => {
-  return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      const data = [];
-      res.on("data", (chunk) => data.push(chunk));
-      res.on("end", () => resolve(Buffer.concat(data)));
-      res.on("error", reject);
-    });
-  });
-};
 
 module.exports = async () => {
-  try {
-    const users = [];
-    const hashedPassword = await bcrypt.hash("1234", 10);
+  const users = [];
+  const hashedPassword = await bcrypt.hash("1234", 10);
+  const imgDir = path.join(__dirname, "/../public/img");
+  const BgUser = path.join(__dirname, "/../public/backgrounds");
 
-    // Crear los usuarios
-    for (let i = 0; i < 100; i++) {
-      const firstname = faker.person.firstName().split(" ")[0];
-      const lastname = faker.person.lastName().split(" ")[0];
-      const username = `${firstname.toLowerCase()}${lastname.toLowerCase()}`;
-      const avatarUrl = faker.image.avatar();
-      const avatarBuffer = await fetchImageBuffer(avatarUrl);
 
-      const avatarFileName = await uploadAvatarToSupabase(avatarBuffer);
 
-      const user = {
-        firstname,
-        lastname,
-        username,
+
+  for (let i = 0; i <= 10; i++) {
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const age = faker.number.int({ min: 18, max: 80 });
+    const email = faker.internet.email({ firstName, lastName, provider: "gmail.com" });
+    const username = faker.helpers.mustache('{{word}}{{count}}', {
+      count: () => `${faker.number.int({ max: 870 })}`,
+      word: `${faker.word.verb({ length: { min: 5, max: 12 } })}`
+    })
+
+    // Background Profile 
+
+    const imageHead = faker.image.urlLoremFlickr({ width: 908, height: 250, category: 'nature' });
+
+
+
+    // Para el Avatar:  Generar un nombre único para la imagen utilizando crypto
+    const imageFileName = `${crypto.randomUUID()}.jpg`;
+
+    // Usar faker.image.personPortrait para obtener una URL de imagen aleatoria y se define el tamaño
+    const imageUrl = faker.image.personPortrait({ size: '256' });
+
+    // Descargar la imagen y guardarla en la carpeta public/img
+    try {
+      const response = await axios({
+        url: imageUrl, BgUser,
+        method: "GET",
+        responseType: "stream",
+      });
+
+      const writer = fs.createWriteStream(path.join(imgDir, imageFileName));
+      response.data.pipe(writer);
+
+      // Esperamos a que se termine de descargar la imagen
+      await new Promise((resolve, reject) => {
+        writer.on("finish", resolve);
+        writer.on("error", reject);
+
+
+      });
+
+
+
+      users.push({
+        firstname: firstName,
+        lastname: lastName,
+        age: age,
+        email: email.toLowerCase(),
+        bio: faker.lorem.sentence(10),
         password: hashedPassword,
-        email: `${username}@gmail.com`,
-        bio: faker.lorem.sentence(),
-        avatar: avatarFileName,
-        following: [],
-        followers: [],
-      };
+        avatar: imageFileName,
+        imgBg: imageHead,
+        username: username,
 
-      users.push(user);
+
+      });
+    } catch (error) {
+      console.error(`Error descargando la imagen: ${error.message}`);
     }
-
-    // Guardar usuarios en la base de datos y obtener sus ObjectIds
-    const savedUsers = await User.insertMany(users);
-    const userMap = savedUsers.reduce((map, user) => {
-      map[user.username] = user._id;
-      return map;
-    }, {});
-
-    // Crear las relaciones de followers y following usando un bucle for
-    for (let i = 0; i < savedUsers.length; i++) {
-      const user = savedUsers[i];
-
-      // Elegimos aleatoriamente hasta 10 usuarios para seguir (puedes ajustar el número)
-      const followingCount = Math.floor(Math.random() * 10) + 1;
-      const following = getRandomUsers(savedUsers, followingCount, user.username);
-
-      // Asignamos los ObjectIds de los usuarios a los que sigue
-      user.following = following.map((u) => userMap[u.username]);
-
-      // Actualizamos los followers de los usuarios que han sido seguidos
-      for (let j = 0; j < following.length; j++) {
-        const followedUser = following[j];
-        if (!followedUser.followers.includes(user._id)) {
-          followedUser.followers.push(user._id); // Aquí se asigna el ObjectId
-        }
-      }
-
-      // Actualizamos los usuarios en la base de datos con las relaciones de following
-      await User.updateOne({ _id: user._id }, { following: user.following });
-
-      // Actualizamos los followers de los usuarios seguidos
-      for (let j = 0; j < following.length; j++) {
-        const followedUser = following[j];
-        const followedUserObjectId = userMap[followedUser.username]; // Usamos ObjectId
-        await User.updateOne({ _id: followedUserObjectId }, { followers: followedUser.followers });
-      }
-    }
-
-    console.log("[Database] Se corrió el seeder de Users.");
-  } catch (error) {
-    console.error("Error al ejecutar el seeder:", error);
   }
-};
 
-// Función para obtener usuarios aleatorios para seguir usando lodash
-const getRandomUsers = (users, count, excludeUsername) => {
-  // Filtramos para evitar que un usuario se siga a sí mismo
-  const otherUsers = users.filter((user) => user.username !== excludeUsername);
-
-  // Usamos lodash _.sampleSize para obtener un número aleatorio de usuarios para seguir
-  const randomUsers = _.sampleSize(otherUsers, count);
-
-  return randomUsers;
+  await User.insertMany(users);
+  console.log("[Database] Se corrió el seeder de Users.");
 };

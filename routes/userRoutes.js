@@ -16,11 +16,11 @@ router.post("/", userController.store);
 
 router.use(checkAuth);
 
-router.patch("/:id", userController.update);
-router.delete("/:id", userController.destroy);
+router.patch("/:username", userController.update);
+router.delete("/:username", userController.destroy);
 
-router.get("/:id/followers", userController.showFollowers);
-router.get("/:id/followings", userController.showFollowings);
-router.patch("/:id/follow", userController.toggleFollow);
+router.get("/:username/followers", userController.showFollowers);
+router.get("/:username/followings", userController.showFollowings);
+router.patch("/:username/follow", userController.toggleFollow);
 
 module.exports = router;
