@@ -5,7 +5,6 @@ const bcrypt = require("bcryptjs");
 const _ = require("lodash");
 
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
 const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
@@ -15,7 +14,7 @@ module.exports = async () => {
   const users = [];
   const hashedPassword = await bcrypt.hash("1234", 10);
   const imgDir = path.join(__dirname, "/../public/img");
-  const BgUser = path.join(__dirname, "/../public/backgrounds");
+  
 
 
 
@@ -31,11 +30,10 @@ module.exports = async () => {
     })
 
     // Background Profile 
-
+    
     const imageHead = faker.image.urlLoremFlickr({ width: 908, height: 250, category: 'nature' });
-
-
-
+  
+    
     // Para el Avatar:  Generar un nombre único para la imagen utilizando crypto
     const imageFileName = `${crypto.randomUUID()}.jpg`;
 
@@ -45,7 +43,7 @@ module.exports = async () => {
     // Descargar la imagen y guardarla en la carpeta public/img
     try {
       const response = await axios({
-        url: imageUrl, BgUser,
+        url: imageUrl, 
         method: "GET",
         responseType: "stream",
       });
@@ -73,6 +71,8 @@ module.exports = async () => {
         avatar: imageFileName,
         imgBg: imageHead,
         username: username,
+        following: [],
+        followers: [],
 
 
       });
