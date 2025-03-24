@@ -43,7 +43,7 @@ async function store(req, res) {
     form.parse(req, async (err, fields, files) => {
       if (err) return err;
 
-      const { firstname, lastname, username, password, bio, age, email } = fields;
+      const { firstname, lastname, username, password, bio, age, email, imgBg } = fields;
       if (!firstname || !lastname || !username || !password || !email) {
         return res.status(400).json({ msg: "Missing required fields." });
       }
@@ -69,6 +69,7 @@ async function store(req, res) {
         password: hashedPassword,
         bio,
         avatar: newFileName,
+        imgBg,
       });
       return res.status(200).json({ newUser });
     });
@@ -104,6 +105,7 @@ async function update(req, res) {
         bio,
         email,
         avatar: newFileName,
+        imgBg,
       };
 
       const { data, error } = await supabase.storage

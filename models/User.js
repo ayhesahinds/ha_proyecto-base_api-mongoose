@@ -10,6 +10,11 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Last name is required"],
     },
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+      unique: [true, "Username has already used" ]
+    },
     age: Number,
     username: {
       type: String,
@@ -30,7 +35,7 @@ const userSchema = new Schema(
       type: String,
     },
     avatar: String,
-    background: String,
+    imgBg: String,
     tweets: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     followings: [{ type: Schema.Types.ObjectId, ref: "User" }],
